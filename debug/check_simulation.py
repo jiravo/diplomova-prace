@@ -127,3 +127,16 @@ import pandas as pd
 failures = pd.read_csv("data/Source/failures.csv")
 
 print(failures["machine_id"].value_counts().sort_index())
+
+
+print("##############")
+
+print(df[(df["is_running"] == 0) & (df["produced_units"] > 0)])
+
+
+print(failures["severity_id"].value_counts())
+
+
+print(
+    failures[failures["failure_type"] == "electrical"]["technician_id"].value_counts()
+)

@@ -14,7 +14,7 @@ def initialize_machine_states(machines):
 
     for _, row in machines.iterrows():
 
-        rng = np.random.default_rng()
+        rng = np.random.default_rng(42)
 
         age_years = row["machine_age_years"]
 
@@ -31,7 +31,7 @@ def initialize_machine_states(machines):
         else:  # Test
             base = 0.00016
 
-        base_degradation = base * age_factor
+        base_degradation = base * age_factor * 1.26
 
         # starší stroje mají vyšší threshold
         failure_threshold = 0.45 + (age_years / 50)
@@ -94,7 +94,7 @@ def simulate_hour(state):
         # -----------------------------
         # NORMAL DEGRADATION
         # -----------------------------
-        degradation = state["base_degradation"] * state["rng"].uniform(0.8, 1.2)
+        degradation = state["base_degradation"] * state["rng"].uniform(0.8, 1.3)
 
         state["health"] -= degradation
         state["health"] = max(state["health"], 0.05)
@@ -289,6 +289,8 @@ def check_failure(state, sensors):
 
 def run_factory_simulation(machines, time_df):
 
+    maintenance_rng = np.random.default_rng(84)
+
     states = initialize_machine_states(machines)
 
     sensor_rows = []
@@ -302,7 +304,7 @@ def run_factory_simulation(machines, time_df):
         # ============================
         # ZPRACUJEME KAŽDOU LINKU ZVLÁŠŤ
         # ============================
-        for line_id in set(s["line_id"] for s in states):
+        for line_id in machines["line_id"].unique():
 
             # vezmeme stroje jedné linky
             line_states = [s for s in states if s["line_id"] == line_id]
@@ -312,13 +314,15 @@ def run_factory_simulation(machines, time_df):
 
             line_blocked = False
 
-            for i, state in enumerate(line_states):
+            for state in line_states:
 
-                # simulate hour přímo nad objektem
+                # simulace degradace
                 simulate_hour(state)
 
+                # ==============================
+                # pokud je linka blokovaná
+                # ==============================
                 if line_blocked:
-                    state["is_running"] = False
 
                     sensors = generate_sensor_values(state, timestamp)
 
@@ -326,19 +330,31 @@ def run_factory_simulation(machines, time_df):
                     sensors["defective_units"] = 0
                     sensors["ok_units"] = 0
 
+                    # stroj není v poruše
+                    state["is_running"] = True
+
                     failure_started = False
-                    duration = 0
                     failure_type = None
 
                 else:
+
+                    # nejdřív vygenerujeme senzory
                     sensors = generate_sensor_values(state, timestamp)
 
+                    # pak kontrola poruchy
                     failure_started, duration, failure_type = check_failure(
                         state, sensors
                     )
 
                     if state["failure_remaining_hours"] > 0:
+
                         line_blocked = True
+
+                        state["is_running"] = False
+
+                        sensors["produced_units"] = 0
+                        sensors["defective_units"] = 0
+                        sensors["ok_units"] = 0
 
                 # ---------------- SENSOR DATA ----------------
                 sensor_rows.append(
@@ -374,7 +390,7 @@ def run_factory_simulation(machines, time_df):
                             "machine_id": state["machine_id"],
                             "line_id": state["line_id"],
                             "failure_time": timestamp,
-                            "downtime_hours": duration,
+                            "duration_hours": duration,
                             "failure_type": failure_type,
                         }
                     )
@@ -382,4 +398,108 @@ def run_factory_simulation(machines, time_df):
     sensor_df = pd.DataFrame(sensor_rows)
     failures_df = pd.DataFrame(failures)
 
+    # ==============================
+    # ADD FAILURE ID
+    # ==============================
+    if not failures_df.empty:
+        failures_df.insert(0, "failure_id", range(1, len(failures_df) + 1))
+
+        failures_df = generate_failure_details(failures_df, maintenance_rng)
+
     return sensor_df, failures_df
+
+
+def generate_failure_details(failures_df, rng):
+
+    failures_df["severity_id"] = rng.choice(
+        [1, 2, 3], size=len(failures_df), p=[0.4, 0.4, 0.2]
+    )
+
+    response_times = []
+    repair_times = []
+    repair_start_times = []
+    repair_end_times = []
+    downtime_minutes = []
+
+    for _, row in failures_df.iterrows():
+
+        failure_time = pd.to_datetime(row["failure_time"])
+
+        # DOWNTIME Z SIMULACE
+        downtime = row["duration_hours"] * 60
+
+        severity = row["severity_id"]
+
+        if severity == 1:
+            response_ratio = rng.uniform(0.3, 0.5)
+
+        elif severity == 2:
+            response_ratio = rng.uniform(0.15, 0.35)
+
+        else:
+            response_ratio = rng.uniform(0.05, 0.2)
+
+        response = int(downtime * response_ratio)
+        repair = downtime - response
+
+        repair_start = failure_time + pd.Timedelta(minutes=response)
+        repair_end = repair_start + pd.Timedelta(minutes=repair)
+
+        response_times.append(response)
+        repair_times.append(repair)
+        downtime_minutes.append(downtime)
+        repair_start_times.append(repair_start)
+        repair_end_times.append(repair_end)
+
+    failures_df.drop(columns=["duration_hours"], inplace=True)
+    failures_df["response_time_minutes"] = response_times
+    failures_df["repair_time_minutes"] = repair_times
+    failures_df["downtime_minutes"] = downtime_minutes
+    failures_df["repair_start_time"] = repair_start_times
+    failures_df["repair_end_time"] = repair_end_times
+
+    # SHIFT
+    failures_df["shift_id"] = pd.to_datetime(
+        failures_df["repair_start_time"]
+    ).dt.hour.apply(get_shift_id)
+
+    # TECHNICIAN
+    technician_ids = []
+
+    for _, row in failures_df.iterrows():
+
+        severity = row["severity_id"]
+        failure_type = row["failure_type"]
+
+        # EXTERNAL SERVICE
+        if severity == 3 and rng.random() < 0.1:
+            tech = 11
+
+        else:
+
+            if failure_type == "electrical":
+
+                tech = rng.choice([8, 9, 10, 1], p=[0.35, 0.30, 0.25, 0.10])
+
+            else:
+
+                tech = rng.choice(
+                    [2, 3, 4, 5, 6, 7, 8, 9, 10, 1],
+                    p=[0.12, 0.12, 0.12, 0.12, 0.10, 0.10, 0.10, 0.08, 0.08, 0.06],
+                )
+
+        technician_ids.append(tech)
+
+    failures_df["technician_id"] = technician_ids
+
+    return failures_df
+
+
+def get_shift_id(hour):
+
+    if 6 <= hour < 14:
+        return 1
+    elif 14 <= hour < 22:
+        return 2
+    else:
+        return 3

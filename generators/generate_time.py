@@ -46,7 +46,7 @@ def generate_time():
     df_time = pd.DataFrame({"timestamp": time_index})
 
     df_time["date_key"] = df_time["timestamp"].dt.strftime("%Y%m%d").astype(int)
-    df_time["date"] = df_time["timestamp"].dt.date
+    df_time["date"] = df_time["timestamp"].dt.normalize()
     df_time["year"] = df_time["timestamp"].dt.year
     df_time["quarter"] = df_time["timestamp"].dt.quarter
     df_time["month"] = df_time["timestamp"].dt.month
@@ -56,7 +56,7 @@ def generate_time():
     df_time["day_of_week"] = df_time["timestamp"].dt.day_name().map(CZECH_DAYS)
     df_time["day_of_week_number"] = df_time["timestamp"].dt.weekday + 1
     df_time["hour"] = df_time["timestamp"].dt.hour
-    df_time["day_of_week_number"] >= 6
+    df_time["is_weekend"] = (df_time["timestamp"].dt.weekday >= 5).astype(int)
 
     # SHIFT LOGIC
     shifts = df_time["hour"].apply(get_shift)

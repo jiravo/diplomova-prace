@@ -1,5 +1,5 @@
 failure_type_id,failure_type,description
 1,Mechanická,Mechanické opotřebení nebo selhání pohyblivých částí
 2,Přehřátí,Nadměrná teplota způsobená zatížením nebo nedostatečným chlazením
-3,Tlaková,Nestabilita nebo pokles tlaku v systému
+3,Tlaková,Nestabilita nebo výrazná změna tlaku v systému
 4,Elektrická,Porucha elektrických komponent nebo řídicího systému

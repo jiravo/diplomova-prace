@@ -10,7 +10,7 @@ def generate_D_FailureType():
             "Přehřátí",
             "Nadměrná teplota způsobená zatížením nebo nedostatečným chlazením",
         ),
-        (3, "Tlaková", "Nestabilita nebo pokles tlaku v systému"),
+        (3, "Tlaková", "Nestabilita nebo výrazná změna tlaku v systému"),
         (4, "Elektrická", "Porucha elektrických komponent nebo řídicího systému"),
     ]
 

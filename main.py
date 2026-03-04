@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 
-from generators.generate_machines import generate_machines
 from generators.generate_D_Machine import generate_D_Machine
 from generators.generate_time import generate_time
 from generators.factory_simulation import run_factory_simulation
@@ -12,6 +11,8 @@ from generators.generate_D_MaintenanceType import generate_D_MaintenanceType
 from generators.generate_D_Severity import generate_D_Severity
 from generators.generate_D_FailureType import generate_D_FailureType
 from generators.generate_D_SpareParts import generate_D_SparePart
+from generators.generate_D_Technician import generate_D_Technician
+from generators.generate_maintenance import generate_maintenance
 
 np.random.seed(42)
 
@@ -39,16 +40,20 @@ def main():
     generate_D_MaintenanceType()
 
     # KRITIČNOST
-    print("Generating  severity...")
+    print("Generating severity...")
     generate_D_Severity()
 
     # TYP PORUCHY
-    print("Generating  failure type...")
+    print("Generating failure type...")
     generate_D_FailureType()
 
     # DÍLY
-    print("Generating  spare parts...")
+    print("Generating spare parts...")
     generate_D_SparePart()
+
+    # ZAMĚSTNANCI
+    print("Generating technicians...")
+    generate_D_Technician()
 
     # STROJE
     print("Generating D_Machine...")
@@ -68,11 +73,15 @@ def main():
     print("Running factory simulation...")
     sensor_data, failures = run_factory_simulation(machines, time_df)
 
+    maintenance = generate_maintenance(failures, machines, time_df)
+
     print("Saving data...")
 
     sensor_data.to_csv("data/Source/sensor_data.csv", index=False)
 
     failures.to_csv("data/Source/failures.csv", index=False)
+
+    maintenance.to_csv("data/Source/maintenance.csv", index=False)
 
     print("✅ Simulation finished!")
 
