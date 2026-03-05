@@ -140,3 +140,45 @@ print(failures["severity_id"].value_counts())
 print(
     failures[failures["failure_type"] == "electrical"]["technician_id"].value_counts()
 )
+
+
+maintenance = pd.read_csv("data/Source/maintenance.csv")
+
+print(maintenance["maintenance_type_id"].value_counts())
+
+
+print(maintenance.dtypes)
+
+maintenance = pd.read_csv("data/Source/maintenance.csv")
+
+maintenance["start_time"] = pd.to_datetime(maintenance["start_time"])
+
+print(
+    maintenance[
+        (maintenance["maintenance_type_id"] == 1)
+        & (
+            (maintenance["start_time"].dt.hour < 6)
+            | (maintenance["start_time"].dt.hour >= 22)
+        )
+    ]
+)
+
+
+maintenance = pd.read_csv("data/Source/maintenance.csv")
+
+long_pm = maintenance[
+    (maintenance["maintenance_type_id"] == 1) & (maintenance["duration_minutes"] >= 120)
+]
+
+print(long_pm.groupby("machine_id").size())
+
+print(maintenance.dtypes)
+
+parts = pd.read_csv("data/BI/D_SparePart.csv")
+maintenance = pd.read_csv("data/Source/maintenance.csv")
+
+invalid = maintenance[
+    ~maintenance["part_id"].isin(parts["part_id"]) & maintenance["part_id"].notna()
+]
+
+print(invalid)

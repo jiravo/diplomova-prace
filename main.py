@@ -13,6 +13,8 @@ from generators.generate_D_FailureType import generate_D_FailureType
 from generators.generate_D_SpareParts import generate_D_SparePart
 from generators.generate_D_Technician import generate_D_Technician
 from generators.generate_maintenance import generate_maintenance
+from generators.generate_maintenance import add_labor_and_parts
+
 
 np.random.seed(42)
 
@@ -49,11 +51,11 @@ def main():
 
     # DÍLY
     print("Generating spare parts...")
-    generate_D_SparePart()
+    spare_parts_df = generate_D_SparePart()
 
     # ZAMĚSTNANCI
     print("Generating technicians...")
-    generate_D_Technician()
+    technician_df = generate_D_Technician()
 
     # STROJE
     print("Generating D_Machine...")
@@ -74,6 +76,8 @@ def main():
     sensor_data, failures = run_factory_simulation(machines, time_df)
 
     maintenance = generate_maintenance(failures, machines, time_df)
+
+    maintenance = add_labor_and_parts(maintenance, technician_df, spare_parts_df)
 
     print("Saving data...")
 
