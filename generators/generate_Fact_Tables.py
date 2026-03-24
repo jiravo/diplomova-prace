@@ -119,7 +119,9 @@ def generate_fact_tables():
         F_Maintenance["labor_cost"] + F_Maintenance["parts_cost"]
     )
 
-    F_Maintenance.to_csv("data/BI/F_Maintenance.csv", index=False)
+    F_Maintenance["total_cost"] = F_Maintenance["total_cost"].astype(int)
+
+    F_Maintenance.to_csv("data/BI/F_Maintenance.csv", index=False, sep=",", decimal=".")
 
     print("=== FK CHECK ===")
 

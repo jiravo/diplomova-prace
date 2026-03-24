@@ -492,7 +492,9 @@ def add_labor_and_parts(maintenance, technicians_df, spare_parts_df):
 
     maintenance["labor_cost"] = (
         maintenance["hourly_rate"] * (maintenance["duration_minutes"] / 60)
-    ).round(2)
+    ).round(0)
+
+    maintenance["labor_cost"] = maintenance["labor_cost"].astype(int)
 
     maintenance.drop(columns=["hourly_rate"], inplace=True)
 
