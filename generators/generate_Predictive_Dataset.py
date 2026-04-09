@@ -306,6 +306,10 @@ for machine in ml_df["machine_id"].unique():
 
         current_time = row["timestamp"]
 
+        # 👉 jen pokud má nastat porucha do 72h
+        if row["target_failure_72h"] != 1:
+            continue
+
         future_failures = machine_failures[
             machine_failures["failure_time"] >= current_time
         ]
@@ -315,9 +319,9 @@ for machine in ml_df["machine_id"].unique():
 
         next_failure = future_failures.iloc[0]
 
-        ml_df.loc[idx, "target_failure_type"] = next_failure["failure_type"]
-
-print(ml_df["target_failure_type"].value_counts())
+        # 🔥 KLÍČOVÁ PODMÍNKA
+        if next_failure["failure_time"] <= current_time + pd.Timedelta(hours=72):
+            ml_df.loc[idx, "target_failure_type"] = next_failure["failure_type"]
 
 # ===============================
 # TARGET RUL HOURS
