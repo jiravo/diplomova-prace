@@ -1,0 +1,13 @@
+Machine ID,Machine Name,Failure Prediction (0/1),Failure Prediction (YES/NO),Failure Probability (%),Risk Level
+1,L1 - Řezací stanice,1,YES,77.1,🔴 HIGH
+12,L3 - Testovací stanice,1,YES,71.9,🔴 HIGH
+11,L3 - Montážní stanice,1,YES,50.9,🟠 MEDIUM
+3,L1 - Montážní stanice,0,NO,10.8,🟢 LOW
+5,L2 - Řezací stanice,0,NO,2.7,🟢 LOW
+7,L2 - Montážní stanice,0,NO,1.7,🟢 LOW
+6,L2 - Lis,0,NO,0.1,🟢 LOW
+10,L3 - Lis,0,NO,0.1,🟢 LOW
+9,L3 - Řezací stanice,0,NO,0.1,🟢 LOW
+2,L1 - Lis,0,NO,0.1,🟢 LOW
+8,L2 - Testovací stanice,0,NO,0.1,🟢 LOW
+4,L1 - Testovací stanice,0,NO,0.1,🟢 LOW
