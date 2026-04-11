@@ -1,0 +1,4 @@
+Machine ID,Machine Name,Failure Prediction (YES/NO),Failure Probability (%),Risk Level,Predicted Failure Type,Type Confidence (%)
+1,L1 - Řezací stanice,YES,77.1,🔴 HIGH,mechanical,35.4
+12,L3 - Testovací stanice,YES,71.9,🔴 HIGH,electrical,95.0
+11,L3 - Montážní stanice,YES,50.9,🟠 MEDIUM,mechanical,59.7
