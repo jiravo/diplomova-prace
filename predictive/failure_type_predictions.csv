@@ -1,4 +1,4 @@
-Stroj ID,Stroj název,Predikce poruchy (ANO/NE),Pravděpodobnost poruchy (%),Úroveň rizika,Predikovaný typ poruchy,Pravděpodobnost typu poruchy (%)
+Stroj ID,Stroj název,Predikce poruchy (ANO/NE),Riziko poruchy do 72 h (%),Úroveň rizika,Predikovaný typ poruchy,Pravděpodobnost typu poruchy (%)
 1,L1 - Řezací stanice,ANO,77.1,🔴 VYSOKÁ,Mechanická,35.4
 12,L3 - Testovací stanice,ANO,71.9,🔴 VYSOKÁ,Elektrická,95.0
 11,L3 - Montážní stanice,ANO,50.9,🟠 STŘEDNÍ,Mechanická,59.7

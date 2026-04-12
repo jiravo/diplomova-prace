@@ -1,4 +1,4 @@
-Stroj ID,Stroj název,Predikce poruchy (0/1),Predikce poruchy (ANO/NE),Pravděpodobnost poruchy (%),Úroveň rizika
+Stroj ID,Stroj název,Predikce poruchy (0/1),Predikce poruchy (ANO/NE),Riziko poruchy do 72 h (%),Úroveň rizika
 1,L1 - Řezací stanice,1,ANO,77.1,🔴 VYSOKÁ
 12,L3 - Testovací stanice,1,ANO,71.9,🔴 VYSOKÁ
 11,L3 - Montážní stanice,1,ANO,50.9,🟠 STŘEDNÍ
