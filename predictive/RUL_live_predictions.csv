@@ -1,0 +1,13 @@
+Timestamp,Machine ID,Machine Name,Predicted RUL (hours),Predicted RUL (days)
+2024-12-31,1,L1 - Řezací stanice,24.5,1.0
+2024-12-31,12,L3 - Testovací stanice,49.2,2.0
+2024-12-31,11,L3 - Montážní stanice,71.3,3.0
+2024-12-31,3,L1 - Montážní stanice,123.9,5.2
+2024-12-31,7,L2 - Montážní stanice,132.7,5.5
+2024-12-31,9,L3 - Řezací stanice,316.7,13.2
+2024-12-31,5,L2 - Řezací stanice,323.9,13.5
+2024-12-31,6,L2 - Lis,363.7,15.2
+2024-12-31,10,L3 - Lis,386.6,16.1
+2024-12-31,8,L2 - Testovací stanice,448.8,18.7
+2024-12-31,4,L1 - Testovací stanice,495.6,20.6
+2024-12-31,2,L1 - Lis,695.4,29.0
